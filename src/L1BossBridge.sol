@@ -67,6 +67,10 @@ contract L1BossBridge is Ownable, Pausable, ReentrancyGuard {
      * @param l2Recipient The address of the user who will receive the tokens on L2
      * @param amount The amount of tokens to deposit
      */
+
+    // @audit this is definitively an issue !!!
+    // Alice : approve token -> bridge
+    // Bob : depositTokensToL2(from: Alice, l2Recipient: Bob, all her money !!!)
     function depositTokensToL2(address from, address l2Recipient, uint256 amount) external whenNotPaused {
         if (token.balanceOf(address(vault)) + amount > DEPOSIT_LIMIT) {
             revert L1BossBridge__DepositLimitReached();
@@ -74,6 +78,7 @@ contract L1BossBridge is Ownable, Pausable, ReentrancyGuard {
         token.safeTransferFrom(from, address(vault), amount);
 
         // Our off-chain service picks up this event and mints the corresponding tokens on L2
+        // @audit-info should follow CEI pattern
         emit Deposit(from, l2Recipient, amount);
     }
 
@@ -109,6 +114,9 @@ contract L1BossBridge is Ownable, Pausable, ReentrancyGuard {
      * @param s The s value of the signature
      * @param message The message/data to be sent to L1 (can be blank)
      */
+
+     // v,r,s get placed on chain, so visible to everyone
+     // we have access to the signed message, not the private key
     function sendToL1(uint8 v, bytes32 r, bytes32 s, bytes memory message) public nonReentrant whenNotPaused {
         address signer = ECDSA.recover(MessageHashUtils.toEthSignedMessageHash(keccak256(message)), v, r, s);
 
@@ -118,6 +126,8 @@ contract L1BossBridge is Ownable, Pausable, ReentrancyGuard {
 
         (address target, uint256 value, bytes memory data) = abi.decode(message, (address, uint256, bytes));
 
+        // q slither said this is bad, is that ok ?
+        // data with crazy gas costs !
         (bool success,) = target.call{ value: value }(data);
         if (!success) {
             revert L1BossBridge__CallFailed();

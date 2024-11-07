@@ -1,4 +1,4 @@
-### [H-1] Users who give tokens approvals to L1BossBridge may have those assest stolen
+### [H-1] Users who give tokens approvals to `L1BossBridge` may have those assest stolen
 
 **Description:** The `depositTokensToL2` function allows anyone to call it with a from address of any account that has approved tokens to the bridge.
 
@@ -45,7 +45,7 @@ Consider modifying the depositTokensToL2 function so that the caller cannot spec
 }
 ```
 
-### [H-2] Calling depositTokensToL2 from the Vault contract to the Vault contract allows infinite minting of unbacked tokens
+### [H-2] Calling `depositTokensToL2` from the Vault contract to the Vault contract allows infinite minting of unbacked tokens
 
 **Description:** depositTokensToL2 function allows the caller to specify the from address, from which tokens are taken.
 
@@ -81,7 +81,7 @@ function testCanTransferFromVaultToVault() public {
 
 **Recommended Mitigation:** As suggested in H-1, consider modifying the depositTokensToL2 function so that the caller cannot specify a from address.
 
-### [H-3] Lack of replay protection in withdrawTokensToL1 allows withdrawals by signature to be replayed
+### [H-3] Lack of replay protection in `withdrawTokensToL1` allows withdrawals by signature to be replayed
 
 **Description:** Users who want to withdraw tokens from the bridge can call the sendToL1 function, or the wrapper `withdrawTokensToL1` function. These functions require the caller to send along some withdrawal data signed by one of the approved bridge operators.
 
@@ -119,7 +119,7 @@ function testCanReplayWithdrawals() public {
 
 **Recommended Mitigation:** Consider redesigning the withdrawal mechanism so that it includes replay protection.
 
-### [H-4] L1BossBridge::sendToL1 allowing arbitrary calls enables users to call L1Vault::approveTo and give themselves infinite allowance of vault funds
+### [H-4] ``L1BossBridge::sendToL1` allowing arbitrary calls enables users to call L1Vault::approveTo and give themselves infinite allowance of vault funds
 
 **Description:** The `L1BossBridge` contract includes the `sendToL1` function that, if called with a valid signature by an operator, can execute arbitrary low-level calls to any given target. Because there's no restrictions neither on the target nor the calldata, this call could be used by an attacker to execute sensitive contracts of the bridge. For example, the `L1Vault` contract.
 
@@ -159,6 +159,15 @@ function testCanCallVaultApproveFromBridgeAndDrainVault() public {
 
 ### [H-5] CREATE opcode does not work on zksync era
 
+**Description:**
+
+**Impact:**
+
+**Proof of Concept:**
+
+**Recommended Mitigation:**
+
+### [H-6] ``L1BossBridge::depositTokensToL2's` DEPOSIT_LIMIT check allows contract to be DoS'd
 
 **Description:**
 
@@ -168,7 +177,7 @@ function testCanCallVaultApproveFromBridgeAndDrainVault() public {
 
 **Recommended Mitigation:**
 
-### [H-6] L1BossBridge::depositTokensToL2's DEPOSIT_LIMIT check allows contract to be DoS'd
+### [H-7] The `L1BossBridge::withdrawTokensToL1` function has no validation on the withdrawal amount being the same as the deposited amount in `L1BossBridge::depositTokensToL2`, allowing attacker to withdraw more funds than deposited
 
 **Description:**
 
@@ -178,7 +187,7 @@ function testCanCallVaultApproveFromBridgeAndDrainVault() public {
 
 **Recommended Mitigation:**
 
-### [H-7] The L1BossBridge::withdrawTokensToL1 function has no validation on the withdrawal amount being the same as the deposited amount in L1BossBridge::depositTokensToL2, allowing attacker to withdraw more funds than deposited
+### [H-8] `TokenFactory::deployToken` locks tokens forever
 
 **Description:**
 
@@ -187,18 +196,6 @@ function testCanCallVaultApproveFromBridgeAndDrainVault() public {
 **Proof of Concept:**
 
 **Recommended Mitigation:**
-
-
-### [H-8] TokenFactory::deployToken locks tokens forever
-
-**Description:**
-
-**Impact:**
-
-**Proof of Concept:**
-
-**Recommended Mitigation:**
-
 
 ### [M-1] Withdrawals are prone to unbounded gas consumption due to return bombs
 
