@@ -21,6 +21,7 @@ contract TokenFactory is Ownable {
      * @param contractBytecode The bytecode of the new token
      */
     function deployToken(string memory symbol, bytes memory contractBytecode) public onlyOwner returns (address addr) {
+        //q are you sure you want thos out of scope ???
         assembly {
             addr := create(0, add(contractBytecode, 0x20), mload(contractBytecode))
         }
