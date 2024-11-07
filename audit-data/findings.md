@@ -47,9 +47,9 @@ Consider modifying the depositTokensToL2 function so that the caller cannot spec
 
 ### [H-2] Calling `depositTokensToL2` from the Vault contract to the Vault contract allows infinite minting of unbacked tokens
 
-**Description:** depositTokensToL2 function allows the caller to specify the from address, from which tokens are taken.
+**Description:** `depositTokensToL2` function allows the caller to specify the from address, from which tokens are taken.
 
-Because the vault grants infinite approval to the bridge already (as can be seen in the contract's constructor), it's possible for an attacker to call the depositTokensToL2 function and transfer tokens from the vault to the vault itself.
+Because the vault grants infinite approval to the bridge already (as can be seen in the contract's constructor), it's possible for an attacker to call the `depositTokensToL2` function and transfer tokens from the vault to the vault itself.
 
 **Impact:** This would allow the attacker to trigger the Deposit event any number of times, presumably causing the minting of unbacked tokens in L2.
 
@@ -79,7 +79,7 @@ function testCanTransferFromVaultToVault() public {
 }
 ```
 
-**Recommended Mitigation:** As suggested in H-1, consider modifying the depositTokensToL2 function so that the caller cannot specify a from address.
+**Recommended Mitigation:** As suggested in H-1, consider modifying the `depositTokensToL2` function so that the caller cannot specify a from address.
 
 ### [H-3] Lack of replay protection in `withdrawTokensToL1` allows withdrawals by signature to be replayed
 
@@ -119,7 +119,7 @@ function testCanReplayWithdrawals() public {
 
 **Recommended Mitigation:** Consider redesigning the withdrawal mechanism so that it includes replay protection.
 
-### [H-4] ``L1BossBridge::sendToL1` allowing arbitrary calls enables users to call L1Vault::approveTo and give themselves infinite allowance of vault funds
+### [H-4] ``L1BossBridge::sendToL1` allowing arbitrary calls enables users to call `L1Vault::approveTo` and give themselves infinite allowance of vault funds
 
 **Description:** The `L1BossBridge` contract includes the `sendToL1` function that, if called with a valid signature by an operator, can execute arbitrary low-level calls to any given target. Because there's no restrictions neither on the target nor the calldata, this call could be used by an attacker to execute sensitive contracts of the bridge. For example, the `L1Vault` contract.
 
